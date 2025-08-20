@@ -24,8 +24,16 @@ export default function HomePage() {
 
   useEffect(() => {
     // Check for existing session
-    checkSession();
-    loadMemories();
+    const initializeApp = async () => {
+      try {
+        await checkSession();
+        await loadMemories();
+      } catch (error) {
+        console.error('App initialization failed:', error);
+      }
+    };
+    
+    initializeApp();
   }, []);
 
   const checkSession = async () => {
