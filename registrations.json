@@ -1,0 +1,22 @@
+[
+  {
+    "registrationId": "CEXY_CYXE_MELSSTJU",
+    "username": "cyxe",
+    "userId": "c58bf6b1-0dce-4b29-823f-29ec139c8f3e",
+    "walletAddress": "c58bf6b1-0dce-4b29-823f-29ec139c8f3e",
+    "transactionId": "88bda1943d6fb084d43bd478fc441d625ee867b572245e7cba849fa850a13455",
+    "paymentId": "uoPvX3fDj5webkDWSPwUwRUHnBka",
+    "amount": 0.01,
+    "timestamp": 1755804726426
+  },
+  {
+    "registrationId": "CEXY_CYXE_MELST6GP",
+    "username": "cyxe",
+    "userId": "c58bf6b1-0dce-4b29-823f-29ec139c8f3e",
+    "walletAddress": "c58bf6b1-0dce-4b29-823f-29ec139c8f3e",
+    "transactionId": "88bda1943d6fb084d43bd478fc441d625ee867b572245e7cba849fa850a13455",
+    "paymentId": "uoPvX3fDj5webkDWSPwUwRUHnBka",
+    "amount": 0.01,
+    "timestamp": 1755804743164
+  }
+]

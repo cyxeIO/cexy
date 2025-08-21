@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ErrorBoundary from "@/components/ErrorBoundary";
+import PiSDKLoader from "@/components/PiSDKLoader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,8 +14,50 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "cexy.ai - Record, Relive, and Own Your Memories",
-  description: "AI-powered memory recording with blockchain security and NFT minting on the Pi Network.",
+  title: {
+    default: "cexy.ai - The Future of Memory",
+    template: "%s | cexy.ai"
+  },
+  description: "AI-powered memory curation meets blockchain security. Record, relive, and own your memories on the Pi Network.",
+  keywords: ["CEXY", "memory", "AI", "blockchain", "Pi Network", "NFT", "decentralized", "beta"],
+  authors: [{ name: "cexy.ai" }],
+  creator: "cexy.ai",
+  publisher: "cexy.ai",
+  applicationName: "cexy.ai",
+  icons: {
+    icon: [
+      { url: '/CEXY_logo_animated.gif', type: 'image/gif' },
+      { url: '/cexy_logo_transparent.gif', type: 'image/gif' },
+      { url: '/favicon.ico', sizes: 'any' }
+    ],
+    apple: [
+      { url: '/cexy_logo_transparent.gif', sizes: '180x180', type: 'image/gif' }
+    ],
+    shortcut: '/CEXY_logo_animated.gif'
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://cexy.ai',
+    title: 'cexy.ai - The Future of Memory',
+    description: 'AI-powered memory curation meets blockchain security',
+    siteName: 'cexy.ai'
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'cexy.ai - The Future of Memory',
+    description: 'AI-powered memory curation meets blockchain security',
+    creator: '@cexyai'
+  },
+  robots: {
+    index: true,
+    follow: true
+  },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1
+  }
 };
 
 export default function RootLayout({
@@ -28,9 +70,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ErrorBoundary>
-          {children}
-        </ErrorBoundary>
+        {children}
+        
+        <PiSDKLoader />
       </body>
     </html>
   );

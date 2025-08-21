@@ -7,7 +7,7 @@ A Next.js application that enables users to record, manage, and relive memories 
 ### Core Functionality
 - **Smart Recording**: Continuous audio/video recording via browser APIs with intelligent quality detection
 - **AI-Powered Curation**: Sentiment analysis, automatic categorization, and highlight detection
-- **Blockchain Security**: Decentralized storage on IPFS/Arweave anchored on Pi blockchain
+- **Blockchain Security**: Decentralized storage on Arweave anchored on Pi blockchain
 - **NFT Minting**: Convert precious memories into NFTs with rarity based on AI analysis
 - **Pi Token Integration**: Pay for premium features and earn rewards with Pi tokens
 - **Privacy-First Design**: Granular sharing controls and data anonymization options
@@ -16,7 +16,7 @@ A Next.js application that enables users to record, manage, and relive memories 
 - **Frontend**: Next.js 15 with TypeScript, App Router, and Tailwind CSS
 - **Backend**: Next.js API routes with Azure SQL Database
 - **Blockchain**: Pi Network integration for wallet authentication and payments
-- **Storage**: IPFS (Helia) and Arweave for decentralized file storage
+- **Storage**: Arweave for decentralized permanent storage
 - **AI Services**: Hugging Face Inference API for sentiment analysis and content processing
 - **Database**: Azure SQL Database with comprehensive schema
 - **UI**: Framer Motion animations, Lucide React icons, React Hot Toast notifications
@@ -64,7 +64,8 @@ AZURE_SQL_PASSWORD=your_password
 HUGGINGFACE_API_KEY=your_huggingface_api_key_here
 
 # Storage Configuration
-IPFS_GATEWAY_URL=https://ipfs.io/ipfs/
+# Remove IPFS Gateway URL environment variable (no longer needed)
+# IPFS_GATEWAY_URL=https://ipfs.io/ipfs/
 ARWEAVE_WALLET_KEY=your_arweave_wallet_key_here
 ```
 
@@ -94,7 +95,7 @@ npm run dev
 - **API Routes**: RESTful endpoints for authentication, memory management, and blockchain operations
 - **Database Schema**: Comprehensive SQL schema for users, memories, and transactions
 - **AI Integration**: Modular AI services for sentiment analysis and content processing
-- **Storage Services**: Unified interface for IPFS and Arweave storage
+- **Storage Services**: Unified interface for Arweave storage
 - **Pi Network SDK**: Integration layer for wallet authentication and payments
 
 ## 🏗️ Project Structure
@@ -114,7 +115,7 @@ src/
 │   ├── ai.ts             # AI processing services
 │   ├── database.ts       # Azure SQL Database utilities
 │   ├── pi-network.ts     # Pi Network SDK integration
-│   └── storage.ts        # IPFS/Arweave storage services
+│   └── storage.ts        # Arweave storage services
 └── types/                 # TypeScript type definitions
     └── index.ts           # Core application types
 ```

@@ -63,7 +63,6 @@ export interface PrivacySettings {
 }
 
 export interface BlockchainData {
-  ipfsHash?: string;
   arweaveId?: string;
   transactionHash?: string;
   nftTokenId?: string;
@@ -224,11 +223,11 @@ export interface StorageUploadResult {
   hash: string;
   url: string;
   size: number;
-  type: 'ipfs' | 'arweave';
+  type: 'arweave';
 }
 
 export interface StorageConfig {
-  provider: 'ipfs' | 'arweave' | 'hybrid';
+  provider: 'arweave';
   encryption: boolean;
   redundancy: number;
   retention: 'permanent' | 'temporary';

@@ -272,7 +272,6 @@ export async function POST(request: NextRequest) {
       privacyLevel: privacyDefaults.isPublic ? 'public' : 'private',
       privacySettings: privacyDefaults,
       blockchainData: {
-        ipfsHash: storageResults.ipfs?.hash,
         arweaveId: storageResults.arweave?.hash,
         isNftMinted: false,
         piTokensEarned: 0,
@@ -297,7 +296,6 @@ export async function POST(request: NextRequest) {
         duration: savedMemory.duration,
         size: savedMemory.size,
         storageUrls: {
-          ipfs: storageResults.ipfs?.url,
           arweave: storageResults.arweave?.url,
         },
         aiResults,

@@ -4,6 +4,10 @@
   "framework": "nextjs",
   "rewrites": [
     {
+      "source": "/validation-key.txt",
+      "destination": "/api/validation-key"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }

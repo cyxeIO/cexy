@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
     // your project has TypeScript errors.
     ignoreBuildErrors: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/validation-key.txt',
+        destination: '/api/validation-key',
+      },
+    ];
+  },
 };
 
 export default nextConfig;

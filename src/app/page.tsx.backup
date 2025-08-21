@@ -8,9 +8,6 @@ import type { PiAuthResult, PiPayment } from '@/types/pi';
 import PiPaymentModal from '@/components/PiPaymentModal';
 import PiSDKLoader from '@/components/PiSDKLoader';
 
-// Payment status type
-type PaymentStatus = 'idle' | 'creating' | 'approving' | 'waiting' | 'completing' | 'success' | 'error';
-
 export default function HomePage() {
   const [walletAddress, setWalletAddress] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
@@ -40,7 +37,7 @@ export default function HomePage() {
 
   // Payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
+  const [paymentStatus, setPaymentStatus] = useState<'creating' | 'approving' | 'waiting' | 'completing' | 'success' | 'error'>('creating');
   const [paymentError, setPaymentError] = useState<string | undefined>();
   const [paymentAmount, setPaymentAmount] = useState(0.01);
   const [paymentMemo, setPaymentMemo] = useState('');
@@ -477,34 +474,9 @@ export default function HomePage() {
     toast('Incomplete payment found. Please complete it to finish registration.', { icon: 'ℹ️' });
   };
 
-  const resetPaymentState = () => {
-    console.log('🔄 Resetting payment state for fresh attempt');
-    setShowPaymentModal(false);
-    setIsRegistering(false);
-    setPaymentStatus('idle'); // Completely idle state
-    setPaymentError(undefined);
-    setTransactionDetails({});
-    setPaymentAmount(0.01);
-    setPaymentMemo('');
-  };
-
   const handleRegisterClick = async () => {
-    console.log('🔄 Register button clicked - current state:', {
-      user: user?.username,
-      isPiSdkReady,
-      isAlreadyRegistered,
-      isRegistering,
-      paymentStatus
-    });
-
     if (!user) {
       toast.error('Please sign in with Pi Network first');
-      return;
-    }
-
-    if (!isPiSdkReady) {
-      console.error('❌ Pi SDK not ready');
-      toast.error('Pi SDK is not ready yet. Please wait for it to load...');
       return;
     }
 
@@ -513,18 +485,9 @@ export default function HomePage() {
       return;
     }
 
-    // Prevent multiple simultaneous registration attempts
-    if (isRegistering || paymentStatus === 'approving' || paymentStatus === 'waiting' || paymentStatus === 'completing') {
-      console.log('⚠️ Registration already in progress, ignoring click. Status:', paymentStatus);
-      toast('Registration already in progress...', { icon: 'ℹ️' });
-      return;
-    }
-
-    console.log('✅ Starting registration process...');
     setIsRegistering(true);
     setPaymentStatus('creating');
     setShowPaymentModal(true);
-    setPaymentError(undefined); // Clear any previous errors
 
     try {
       const registrationMemo = `CEXY Beta Registration - @${user.username}`;
@@ -539,14 +502,6 @@ export default function HomePage() {
       setPaymentStatus('approving');
 
       const pi = (window as any).Pi;
-      if (!pi) {
-        console.error('❌ Pi SDK not found on window object');
-        throw new Error('Pi SDK not available - please ensure Pi Network is connected');
-      }
-
-      console.log('✅ Pi SDK available, creating payment...');
-      console.log('Available Pi methods:', Object.keys(pi));
-      
       const paymentData = {
         amount: 0.01,
         memo: registrationMemo,
@@ -564,7 +519,12 @@ export default function HomePage() {
           // Show progress toast
           toast.loading('Approving payment on Pi Network...', { id: 'payment-approval' });
           
-          // Set status to waiting - React state might be stale in callback
+          // Prevent duplicate approval calls
+          if (paymentStatus === 'waiting' || paymentStatus === 'approving') {
+            console.log('⚠️ Payment approval already in progress, skipping...');
+            return;
+          }
+          
           setPaymentStatus('waiting');
           
           setTransactionDetails(prev => ({
@@ -608,12 +568,9 @@ export default function HomePage() {
               }
               
               // Handle payment expiration
-              if (responseData.error && (responseData.error.includes('expired') || responseData.error.includes('not found') || responseData.error.includes('payment_not_found'))) {
-                console.error('❌ Payment expired or not found - will reset for fresh attempt');
-                setPaymentStatus('error');
-                setPaymentError('Payment expired. Click "Try Again" to create a fresh payment.');
-                toast.error('Payment expired. Please try again.', { id: 'payment-approval' });
-                return;
+              if (responseData.error && (responseData.error.includes('expired') || responseData.error.includes('not found'))) {
+                console.error('❌ Payment expired or not found');
+                throw new Error('Payment expired. Please try again with a new payment.');
               }
               
               console.error('❌ Approval response not OK:', approveResponse.status, responseData);
@@ -666,7 +623,12 @@ export default function HomePage() {
           // Show completion progress
           toast.loading('Completing registration on blockchain...', { id: 'payment-completion' });
           
-          // Set status to completing - React state might be stale in callback
+          // Prevent duplicate completion calls
+          if (paymentStatus === 'completing') {
+            console.log('⚠️ Payment completion already in progress, skipping...');
+            return;
+          }
+          
           setPaymentStatus('completing');
           
           setTransactionDetails(prev => ({
@@ -1245,6 +1207,126 @@ export default function HomePage() {
         </div>
       </footer>
 
+      {/* Pi Browser Requirement Modal */}
+      {showPiBrowserModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-black border border-white/20 rounded-2xl p-6 max-w-md w-full text-center space-y-6 relative"
+          >
+            {/* Close X Button */}
+            <button
+              onClick={() => setShowPiBrowserModal(false)}
+              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-gray-400 hover:text-white transition-all"
+            >
+              ✕
+            </button>
+            
+            {/* Header */}
+            <div className="space-y-3">
+              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-orange-500/20 to-purple-500/20 rounded-full flex items-center justify-center border border-orange-500/30">
+                <img src="/pi_logo.png" alt="Pi Network" className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-white">Pi Browser Required</h3>
+              <p className="text-gray-300 text-sm leading-relaxed">
+                CEXY integrates directly with Pi Network's blockchain. To ensure secure authentication and payments, you must use the official Pi Browser.
+              </p>
+            </div>
+
+            {/* Download Instructions */}
+            <div className="space-y-4 text-left">
+              <div className="bg-gradient-to-r from-purple-500/10 to-orange-500/10 border border-purple-500/20 rounded-xl p-4">
+                <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                  Download Pi Browser
+                </h4>
+                <div className="space-y-3 text-sm text-gray-300">
+                  <div className="flex items-start gap-3">
+                    <span className="text-purple-400 font-mono text-xs bg-purple-500/20 px-2 py-1 rounded">iOS</span>
+                    <span>Search "Pi Browser" in the App Store</span>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-orange-400 font-mono text-xs bg-orange-500/20 px-2 py-1 rounded">Android</span>
+                    <span>Search "Pi Browser" in Google Play Store</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-orange-500/10 to-purple-500/10 border border-orange-500/20 rounded-xl p-4">
+                <h4 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                  After Installation
+                </h4>
+                <div className="space-y-2 text-sm text-gray-300">
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-400 text-xs">1.</span>
+                    <span>Open Pi Browser</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-400 text-xs">2.</span>
+                    <span>Navigate to cexy.ai</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-orange-400 text-xs">3.</span>
+                    <span>Connect your Pi wallet seamlessly</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-2">
+              <button
+                onClick={() => {
+                  // Copy cexy.ai URL to clipboard
+                  navigator.clipboard.writeText('https://cexy.ai').then(() => {
+                    toast.success('cexy.ai copied to clipboard!', {
+                      duration: 2000,
+                      style: {
+                        background: 'rgba(0, 0, 0, 0.9)',
+                        color: '#ffffff',
+                        border: '1px solid rgba(251, 146, 60, 0.3)',
+                      },
+                    });
+                  }).catch(() => {
+                    toast.error('Failed to copy URL');
+                  });
+                }}
+                className="w-full bg-gradient-to-r from-orange-500 to-purple-500 hover:from-orange-600 hover:to-purple-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+              >
+                Copy cexy.ai URL
+              </button>
+              
+              <button
+                onClick={() => setShowPiBrowserModal(false)}
+                className="w-full bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium py-3 px-4 rounded-xl transition-all"
+              >
+                I'll Download Pi Browser
+              </button>
+              
+              {/* Debug/Testing Skip Button - only show in development or testnet */}
+              {(!isMainnet || process.env.NODE_ENV === 'development') && (
+                <button
+                  onClick={() => {
+                    console.log('🧪 Skipping Pi Browser requirement for testing');
+                    setShowPiBrowserModal(false);
+                  }}
+                  className="w-full bg-yellow-600/20 hover:bg-yellow-600/30 border border-yellow-500/30 text-yellow-300 font-medium py-2 px-4 rounded-xl transition-all text-sm"
+                >
+                  Skip for Testing (Sandbox Mode)
+                </button>
+              )}
+            </div>
+
+            {/* Small note */}
+            <p className="text-xs text-gray-500 leading-relaxed">
+            </p>
+          </motion.div>
+        </div>
+      )}
+
       {/* Pi Payment Modal */}
       <PiPaymentModal
         isOpen={showPaymentModal}
@@ -1256,15 +1338,6 @@ export default function HomePage() {
           } else if (paymentStatus === 'error') {
             setIsRegistering(false);
           }
-        }}
-        onRetry={() => {
-          console.log('🔄 User clicked Try Again - resetting payment state');
-          resetPaymentState();
-          toast('Creating fresh payment...', { icon: '🔄' });
-          // Re-trigger registration after short delay
-          setTimeout(() => {
-            handleRegisterClick();
-          }, 500);
         }}
         amount={paymentAmount}
         memo={paymentMemo}

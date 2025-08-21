@@ -9,7 +9,7 @@ This is a Next.js application for cexy.ai that enables users to record, manage, 
 - **Frontend**: Next.js 15 with TypeScript, App Router, and Tailwind CSS
 - **Backend**: Next.js API routes
 - **Blockchain**: Pi blockchain integration with Pi SDK
-- **Storage**: IPFS/Arweave for decentralized storage
+- **Storage**: Arweave for decentralized storage
 - **AI**: Google Cloud Vision API or Hugging Face for sentiment analysis
 - **Database**: Azure SQL Database
 - **Authentication**: Pi Wallet-based authentication
@@ -41,7 +41,7 @@ This is a Next.js application for cexy.ai that enables users to record, manage, 
 - `/src/types` - TypeScript type definitions
 - `/src/blockchain` - Pi blockchain integration
 - `/src/ai` - AI/ML related functions
-- `/src/storage` - IPFS/Arweave storage utilities
+- `/src/storage` - Arweave storage utilities
 
 ## API Routes
 - `/api/auth` - Pi Wallet authentication
